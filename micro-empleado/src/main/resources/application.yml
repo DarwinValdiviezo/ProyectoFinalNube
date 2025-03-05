@@ -1,0 +1,7 @@
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # remote-jwk-set-uri: "http://127.0.0.1:9000/oauth2/jwks"
+          remote-jwk-set-uri: "http://172.190.133.209:9000/oauth2/jwks"

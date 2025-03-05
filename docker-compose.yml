@@ -1,0 +1,207 @@
+# version: '3.8'
+
+# services:
+#   auth-server:
+#     build:
+#       context: ./auth-server
+#       dockerfile: Dockerfile
+#     ports:
+#       - "9000:9000"
+#     env_file:
+#       - ./auth-server/.env
+#     container_name: auth-server
+#     networks:
+#       - backend
+
+#   client-app:
+#     build:
+#       context: ./client-app
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8080:8080"
+#     depends_on:
+#       - auth-server
+#     restart: on-failure
+#     env_file:
+#       - ./client-app/.env
+#     container_name: client-app
+#     networks:
+#       - backend
+
+#   micro-empleado:
+#     build:
+#       context: ./micro-empleado
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8003:8003"
+#     depends_on:
+#       - mysql
+#       - auth-server
+#     env_file:
+#       - ./micro-empleado/.env
+#     container_name: micro-empleado
+#     networks:
+#       - backend
+
+#   micro-registro:
+#     build:
+#       context: ./micro-registro
+#       dockerfile: Dockerfile
+#     ports:
+#       - "8002:8002"
+#     depends_on:
+#       - postgres
+#       - micro-empleado
+#       - auth-server
+#     env_file:
+#       - ./micro-registro/.env
+#     container_name: micro-registro
+#     networks:
+#       - backend
+
+#   mysql:
+#     image: mysql:latest
+#     container_name: mysql-micro-proyecto
+#     ports:
+#       - "3307:3306"
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=rootpassword
+#       - TZ=America/Guayaquil
+#     volumes:
+#       - mysql-data:/var/lib/mysql
+#     networks:
+#       - backend
+
+#   postgres:
+#     image: postgres:latest
+#     container_name: postgres-micro-proyecto
+#     ports:
+#       - "5433:5432"
+#     environment:
+#       - POSTGRES_USER=root
+#       - POSTGRES_PASSWORD=rootpassword
+#       - POSTGRES_DB=appdb
+#       - TZ=America/Guayaquil
+#     volumes:
+#       - postgres-data:/var/lib/postgresql/data
+#     networks:
+#       - backend
+
+# networks:
+#   backend:
+#     driver: bridge
+
+# volumes:
+#   mysql-data:
+#     driver: local
+#   postgres-data:
+#     driver: local
+
+
+version: '3.8'
+
+services:
+  auth-server:
+    image: adaghost/auth-server:az
+    ports:
+      - "9000:9000"
+    env_file:
+      - ./auth-server/.env
+    container_name: auth-server
+    networks:
+      - backend
+
+  client-app:
+    image: adaghost/client-app:az
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-server
+    restart: on-failure
+    env_file:
+      - ./client-app/.env
+    container_name: client-app
+    networks:
+      - backend
+
+  micro-empleado:
+    image: adaghost/micro-empleado:az
+    ports:
+      - "8003:8003"
+    depends_on:
+      - mysql
+      - auth-server
+    env_file:
+      - ./micro-empleado/.env
+    container_name: micro-empleado
+    networks:
+      - backend
+
+  micro-registro:
+    image: adaghost/micro-registro:az
+    ports:
+      - "8002:8002"
+    depends_on:
+      - postgres
+      - micro-empleado
+      - auth-server
+    env_file:
+      - ./micro-registro/.env
+    container_name: micro-registro
+    networks:
+      - backend
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql-micro-proyecto
+    ports:
+      - "3307:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpassword
+      - TZ=America/Guayaquil
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - backend
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres-micro-proyecto
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=rootpassword
+      - POSTGRES_DB=appdb
+      - TZ=America/Guayaquil
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  frontend:
+    image: darwinvaldiviezo/frontend-frontend:latest
+    ports:
+      - "5173:80"
+    depends_on:
+      - auth-server
+      - client-app
+      - micro-empleado
+      - micro-registro
+    environment:
+      - VITE_API_URL=http://172.190.133.209:8080
+      - VITE_API_EMPLEADOS_URL=http://172.190.133.209:8003/api/empleados
+      - VITE_API_REGISTROS_URL=http://172.190.133.209:8002/api/registros
+    restart: always
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
+  postgres-data:
+    driver: local
