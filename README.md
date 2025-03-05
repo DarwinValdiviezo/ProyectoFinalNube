@@ -166,7 +166,7 @@ Este proyecto está bajo la licencia MIT.
 ## ✨ Autores
 
 - 🐢 **Kubernenes**
-- 🚀 Colaboradores: Par latas de RedBull®, *shotout* a AlfaNet® por no caerse nunca
+- 🚀 Colaboradores: Par latas de RedBull®, *shoutout* a AlfaNet® por no caerse nunca
 
 ---
 
